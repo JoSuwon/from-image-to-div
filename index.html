@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <canvas id="myCanvas" height="2000" width="2000" style="display: none;"></canvas>
+
+  <script>
+    const image = new Image();
+    image.src = './iu.png';
+    // image.src = './2.png';
+    
+
+    const canvas = document.querySelector('#myCanvas');
+    const context = canvas.getContext('2d');
+
+    let colorRows = [];
+    
+    image.onload = () => {
+      context.drawImage(image, 0, 0);
+
+      const WIDTH = image.width;
+      const WIDTH_GAP = WIDTH / 160;
+      // const WIDTH_GAP = 16;
+      const HEIGHT = image.height;
+      const HEIGHT_GAP = HEIGHT / 320;
+      // const HEIGHT_GAP = 16;
+      console.log(`총 div 예상갯수 : ${(WIDTH/WIDTH_GAP) * (HEIGHT/HEIGHT_GAP)}`);
+      
+      for(let y=HEIGHT_GAP/2; y<=HEIGHT; y+=HEIGHT_GAP) {
+        const row = [];
+        for(let x=WIDTH_GAP/2; x<=WIDTH; x+=WIDTH_GAP) {
+          const img_data = context.getImageData(x, y, 1, 1).data;
+          const R = img_data[0];
+          const G = img_data[1];
+          const B = img_data[2];
+          const A = img_data[3];
+          const rgba = `${R},${G},${B},${A}`;
+          
+          row.push(rgba);
+        }
+        colorRows.push(row);
+      }
+
+      for(let i=0; i<colorRows.length; i++) {
+        const rowDiv = document.createElement('div');
+        rowDiv.style.display = 'flex';
+        rowDiv.style.flexDirection = 'row';
+        for(let j=0; j<colorRows[i].length; j++) {
+          const column = document.createElement('div');
+          column.style.backgroundColor = `rgba(${colorRows[i][j]})`;
+          column.style.width = `${WIDTH_GAP}px`;
+          column.style.height = `${HEIGHT_GAP}px`;
+          column.style.margin = `1px 1px 0px 0px`;
+          rowDiv.appendChild(column);
+        }
+        document.body.appendChild(rowDiv);
+      }
+
+      const final = document.createElement('div');
+      final.innerText = '총 div 개수 : ' + (document.querySelectorAll('div').length).toLocaleString() + '개';
+      document.body.appendChild(final);
+    };
+  </script>
+</body>
+</html>
